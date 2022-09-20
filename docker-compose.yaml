@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  
+  jenkins:
+    container_name: jenkins_with_docker
+    build: ./docker/jenkins
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins_home:/var/jenkins_home
+    ports:
+      - 8080:8080
+      - 50000:50000
+    depends_on:
+      - gitlab
+
+  gitlab:
+    container_name: gitlab
+    image: gitlab/gitlab-ce:latest
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - gitlab_data:/var/opt/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_config:/etc/gitlab
+
+  artifactory:
+    container_name: artifactory
+    image: releases-docker.jfrog.io/jfrog/artifactory-oss:latest
+    volumes:
+      - $JFROG_HOME/artifactory/var/:/var/opt/jfrog/artifactory
+    ports:
+      - 8081:8081
+      - 8082:8082
+
+volumes:
+  jenkins_home:
+  gitlab_data:
+  gitlab_logs:
+  gitlab_config:
+#  maven_images:
